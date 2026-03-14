@@ -11,6 +11,7 @@ type KeyMap struct {
 	CtrlD           key.Binding
 	CtrlU           key.Binding
 	ToggleFileTree  key.Binding
+	ToggleFlatList  key.Binding
 	Search          key.Binding
 	Quit            key.Binding
 	Copy            key.Binding
@@ -54,12 +55,16 @@ var keys = &KeyMap{
 		key.WithKeys("e"),
 		key.WithHelp("e", "toggle file tree"),
 	),
+	ToggleFlatList: key.NewBinding(
+		key.WithKeys("f"),
+		key.WithHelp("f", "toggle flat list"),
+	),
 	Search: key.NewBinding(
-		key.WithKeys("t"),
-		key.WithHelp("t", "search files"),
+		key.WithKeys("/"),
+		key.WithHelp("/", "search files"),
 	),
 	Quit: key.NewBinding(
-		key.WithKeys("q", "ctrl+c"),
+		key.WithKeys("q", "esc", "ctrl+c"),
 		key.WithHelp("q", "quit"),
 	),
 	Copy: key.NewBinding(
@@ -97,6 +102,7 @@ func KeyGroups() [][]key.Binding {
 		keys.CtrlU,
 	}, {
 		keys.ToggleFileTree,
+		keys.ToggleFlatList,
 		keys.Search,
 		keys.Copy,
 		keys.OpenInEditor,

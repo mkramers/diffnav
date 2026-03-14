@@ -23,9 +23,11 @@ import (
 )
 
 type Model struct {
-	t     tree.Model
-	files []*gitdiff.File
-	cfg   config.Config
+	t            tree.Model
+	files        []*gitdiff.File
+	cfg          config.Config
+	flatMode     bool
+	navigateDirs bool
 }
 
 func New(cfg config.Config) Model {
@@ -36,8 +38,9 @@ func New(cfg config.Config) Model {
 	t.SetScrollOff(3)
 
 	m := Model{
-		t:   t,
-		cfg: cfg,
+		t:            t,
+		cfg:          cfg,
+		navigateDirs: cfg.UI.NavigateDirs,
 	}
 
 	open, closed := getDirIcons(m.cfg.UI.Icons)
@@ -88,22 +91,22 @@ func (m *Model) updateStyles() {
 	base := lipgloss.NewStyle()
 	m.t.SetStyles(tree.Styles{
 		TreeStyle:       base,
-		RootNodeStyle:   base.Foreground(lipgloss.BrightBlue),
-		ParentNodeStyle: base.Foreground(lipgloss.BrightBlue),
+		RootNodeStyle:   base.Foreground(lipgloss.White),
+		ParentNodeStyle: base.Foreground(lipgloss.White),
 		SelectedNodeStyleFunc: func(children tree.Nodes, i int) lipgloss.Style {
 			base := base.Bold(true).Background(dimmed)
 			child := children.At(i)
 			switch child.GivenValue().(type) {
 			case *filenode.FileNode:
-				return base
+				return base.Foreground(lipgloss.BrightWhite)
 			case string, *dirnode.DirNode:
-				return base.Foreground(lipgloss.BrightBlue)
+				return base.Foreground(lipgloss.BrightWhite)
 			}
 			return base
 		},
 		HelpStyle:               base.MarginTop(1),
 		EnumeratorStyle:         base.Foreground(dimmed),
-		SelectedEnumeratorStyle: base.Bold(true).Foreground(lipgloss.BrightBlue),
+		SelectedEnumeratorStyle: base.Bold(true).Foreground(lipgloss.BrightGreen),
 		IndenterStyle:           base.Foreground(dimmed),
 	})
 
@@ -125,10 +128,37 @@ func (m Model) SetFiles(files []*gitdiff.File) Model {
 
 func (m *Model) Down() {
 	m.t.Down()
+	if !m.navigateDirs {
+		m.skipToFile(1)
+	}
 }
 
 func (m *Model) Up() {
 	m.t.Up()
+	if !m.navigateDirs {
+		m.skipToFile(-1)
+	}
+}
+
+func (m *Model) skipToFile(direction int) {
+	for {
+		node := m.t.NodeAtCurrentOffset()
+		if node == nil {
+			break
+		}
+		if _, ok := node.GivenValue().(*filenode.FileNode); ok {
+			break
+		}
+		if direction > 0 {
+			m.t.Down()
+		} else {
+			m.t.Up()
+		}
+		// Stop if we didn't move (at boundary)
+		if m.t.NodeAtCurrentOffset() == node {
+			break
+		}
+	}
 }
 
 func (m *Model) SetCursorByPath(path string) {
@@ -158,12 +188,40 @@ func (m *Model) SetCursorByPath(path string) {
 }
 
 func (m *Model) rebuildTree() {
-	t := buildFullFileTree(m.files, m.cfg)
-	t = collapseTree(t)
-	t, _ = truncateTree(t, 0, 0, 0, m.cfg, m.t.Width())
+	var t *tree.Node
+	if m.flatMode {
+		t = buildFlatFileTree(m.files, m.cfg, m.t.Width())
+	} else {
+		t = buildFullFileTree(m.files, m.cfg)
+		t = collapseTree(t)
+		t, _ = truncateTree(t, 0, 0, 0, m.cfg, m.t.Width())
+	}
 	m.t.SetNodes(t)
 	m.t.SetWidth(m.t.Width())
 	m.updateStyles()
+}
+
+// ToggleFlatMode switches between tree and flat file list views.
+func (m *Model) ToggleFlatMode() {
+	m.flatMode = !m.flatMode
+	if len(m.files) > 0 {
+		m.rebuildTree()
+	}
+}
+
+func buildFlatFileTree(files []*gitdiff.File, cfg config.Config, width int) *tree.Node {
+	t := tree.Root(&dirnode.DirNode{FullPath: "/", Name: constants.RootName})
+	for _, file := range files {
+		node := &filenode.FileNode{
+			File:         file,
+			Cfg:          cfg,
+			Depth:        1,
+			PanelWidth:   width,
+			ShowFullPath: true,
+		}
+		t.Child(node)
+	}
+	return t
 }
 
 func buildFullFileTree(files []*gitdiff.File, cfg config.Config) *tree.Node {

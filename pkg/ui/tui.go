@@ -173,6 +173,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.search.SetWidth(m.searchWidth())
 			dfCmd := m.diffViewer.SetSize(m.width-sidebarWidth, h)
 			cmds = append(cmds, dfCmd)
+		case key.Matches(msg, keys.ToggleFlatList):
+			m.fileTree.ToggleFlatMode()
 		case key.Matches(msg, keys.ToggleIconStyle):
 			m.cycleIconStyle()
 		case key.Matches(msg, keys.ToggleDiffView):
@@ -353,9 +355,9 @@ func (m mainModel) View() tea.View {
 	leftColor := lipgloss.Color("8")
 	rightColor := lipgloss.Color("8")
 	if m.activePanel == FileTreePanel && !m.searching {
-		leftColor = lipgloss.Color("4")
+		leftColor = lipgloss.Color("10")
 	} else if m.activePanel == DiffViewerPanel {
-		rightColor = lipgloss.Color("4")
+		rightColor = lipgloss.Color("10")
 	}
 
 	// Build T-shaped separator line.
@@ -417,7 +419,7 @@ func (m mainModel) View() tea.View {
 
 	if !m.config.UI.HideHeader {
 		header := lipgloss.NewStyle().Width(m.width).
-			Foreground(lipgloss.Color("6")).
+			Foreground(lipgloss.Color("10")).
 			Bold(true).
 			Render("DIFFNAV")
 		sections = append(sections, header)
@@ -440,7 +442,7 @@ func (m mainModel) View() tea.View {
 		s := lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder(), true).
 			Padding(1, 3).
-			BorderForeground(lipgloss.Blue)
+			BorderForeground(lipgloss.BrightGreen)
 		row := m.height/4 - 2 // just a bit above the center
 		col := m.width / 2
 		col -= lipgloss.Width(helpView) / 2
@@ -495,7 +497,8 @@ func (m mainModel) resultsView() string {
 		if i == m.resultsCursor {
 			sb.WriteString(
 				lipgloss.NewStyle().
-					Background(lipgloss.Color("#1b1b33")).
+					Background(lipgloss.Color("#285e28")).
+					Foreground(lipgloss.BrightWhite).
 					Bold(true).
 					Render(fName) +
 					"\n",

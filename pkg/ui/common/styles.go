@@ -16,8 +16,8 @@ const (
 )
 
 var Colors = map[Key]color.RGBA{
-	Selected:       {R: 0x2d, G: 0x2c, B: 0x35, A: 0xFF}, // "#2d2c35"
-	DarkerSelected: {R: 0x20, G: 0x1F, B: 0x26, A: 0xFF}, // "#201F26"
+	Selected:       {R: 0x28, G: 0x5e, B: 0x28, A: 0xFF}, // "#285e28"
+	DarkerSelected: {R: 0x1a, G: 0x3a, B: 0x1a, A: 0xFF}, // "#1a3a1a"
 }
 
 var BgStyles = map[Key]lipgloss.Style{

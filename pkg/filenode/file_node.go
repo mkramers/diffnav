@@ -31,6 +31,7 @@ type FileNode struct {
 	Selected   bool
 	PanelWidth int
 	Cfg        config.Config
+	ShowFullPath bool
 }
 
 func (f *FileNode) Path() string {
@@ -39,9 +40,12 @@ func (f *FileNode) Path() string {
 
 func (f *FileNode) Value() string {
 	name := filepath.Base(f.Path())
+	if f.ShowFullPath {
+		name = f.Path()
+	}
 
-	// full has a special layout: [status icon] [filename] [file-type icon]
-	if f.Cfg.UI.Icons == IconsNerdFull {
+	// filetype and full use: [status letter/icon] [file-type icon] [filename]
+	if f.Cfg.UI.Icons == IconsNerdFull || f.Cfg.UI.Icons == IconsNerdFiletype {
 		return utils.RemoveReset(f.renderFullLayout(name))
 	}
 
@@ -64,25 +68,17 @@ func (f *FileNode) renderStandardLayout(name string) string {
 	truncatedName := utils.TruncateString(name, nameMaxWidth)
 	coloredIcon := lipgloss.NewStyle().Foreground(f.StatusColor()).Render(icon)
 
+	nameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("15"))
 	if f.Selected {
-		bgStyle := lipgloss.NewStyle().
-			Bold(true).
-			Foreground(f.StatusColor())
+		nameStyle = nameStyle.Bold(true)
 		if f.PanelWidth > 0 {
 			availableWidth := f.PanelWidth - iconWidth - f.Depth
 			if availableWidth > 0 {
-				bgStyle = bgStyle.Width(availableWidth)
+				nameStyle = nameStyle.Width(availableWidth)
 			}
 		}
-		return coloredIcon + bgStyle.Render(truncatedName) + stats
 	}
-
-	if f.Cfg.UI.ColorFileNames {
-		styledName := lipgloss.NewStyle().Foreground(f.StatusColor()).Render(truncatedName)
-		return coloredIcon + styledName + stats
-	}
-
-	return coloredIcon + truncatedName + stats
+	return coloredIcon + nameStyle.Render(truncatedName) + stats
 }
 
 // renderFullLayout renders: [status icon colored] [file-type icon colored] [filename]
@@ -90,36 +86,30 @@ func (f *FileNode) renderStandardLayout(name string) string {
 func (f *FileNode) renderFullLayout(name string) string {
 	statusIcon := f.getStatusIcon()
 	fileIcon := icons.GetIcon(name, false)
-	style := lipgloss.NewStyle().Foreground(f.StatusColor())
+	statusStyle := lipgloss.NewStyle().Foreground(f.StatusColor())
+	iconStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("7"))
 
 	stats := ""
 	if f.Cfg.UI.ShowDiffStats {
 		stats = " " + ViewFileDiffStats(f.File, lipgloss.NewStyle())
 	}
 
-	iconsPrefix := style.Render(statusIcon) + " " + style.Render(fileIcon) + " "
+	iconsPrefix := statusStyle.Render(statusIcon) + " " + iconStyle.Render(fileIcon) + " "
 	iconsWidth := lipgloss.Width(statusIcon) + 1 + lipgloss.Width(fileIcon) + 1
 
 	nameMaxWidth := f.PanelWidth - f.Depth - iconsWidth - lipgloss.Width(stats)
 	truncatedName := utils.TruncateString(name, nameMaxWidth)
 
+	nameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("15"))
 	if f.Selected {
-		bgStyle := style.Bold(true)
+		nameStyle = nameStyle.Bold(true)
 		if f.PanelWidth > 0 {
 			if w := f.PanelWidth - iconsWidth - f.Depth; w > 0 {
-				bgStyle = bgStyle.Width(w)
+				nameStyle = nameStyle.Width(w)
 			}
 		}
-		return iconsPrefix + bgStyle.Render(truncatedName) + stats
 	}
-
-	if f.Cfg.UI.ColorFileNames {
-		return iconsPrefix + style.Render(truncatedName) + stats
-	}
-	return iconsPrefix + lipgloss.NewStyle().
-		Foreground(lipgloss.Color("15")).
-		Render(truncatedName) +
-		stats
+	return iconsPrefix + nameStyle.Render(truncatedName) + stats
 }
 
 // getIcon returns the left icon based on the icon style.
@@ -154,15 +144,23 @@ func (f *FileNode) getIcon() string {
 	}
 }
 
-// getStatusIcon returns the git status indicator icon (used by full layout).
-// Uses the same boxed icons as status style.
+// getStatusIcon returns the git status indicator (used by full layout).
 func (f *FileNode) getStatusIcon() string {
-	if f.File.IsNew {
-		return "\uf457" //
-	} else if f.File.IsDelete {
-		return "\ueadf" //
+	if f.Cfg.UI.Icons == IconsNerdFull {
+		if f.File.IsNew {
+			return "\uf457"
+		} else if f.File.IsDelete {
+			return "\ueadf"
+		}
+		return "\uf459"
 	}
-	return "\uf459" //
+	// Colored letters for filetype and other styles
+	if f.File.IsNew {
+		return "A"
+	} else if f.File.IsDelete {
+		return "D"
+	}
+	return "M"
 }
 
 // StatusColor returns the color for this file based on its git status.
