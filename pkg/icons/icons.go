@@ -101,7 +101,7 @@ var Extensions = map[string]string{
 	"f90":    "\U000f121a",
 	"cob":    "\U0000e657",
 	"cbl":    "\U0000e657",
-	"lisp":   "\U0000f0172",
+	"lisp":   "\U000f0172",
 	"el":     "\U0000e632",
 	"elc":    "\U0000e632",
 	"scm":    "\U0000e6b1",
@@ -116,7 +116,7 @@ var Extensions = map[string]string{
 	"re":     "\U0000e6b0",
 	"rei":    "\U0000e6b0",
 	"fnl":    "\U0000e6af",
-	"gleam":  "\U0000f09a5",
+	"gleam":  "\U000f09a5",
 	"cu":     "\U0000e64b",
 
 	// Web
@@ -129,7 +129,7 @@ var Extensions = map[string]string{
 	"sass":   "\U0000e603",
 	"less":   "\U0000e758",
 	"styl":   "\U0000e600",
-	"vue":    "\U0000f0844",
+	"vue":    "\U000f0844",
 	"svelte": "\U0000e697",
 	"astro":  "\U0000e6b3",
 
@@ -140,8 +140,8 @@ var Extensions = map[string]string{
 	"yaml":    "\U0000e6a8",
 	"yml":     "\U0000e6a8",
 	"toml":    "\U0000e6b2",
-	"xml":     "\U0000f05c0",
-	"xul":     "\U0000f05c0",
+	"xml":     "\U000f05c0",
+	"xul":     "\U000f05c0",
 	"ini":     "\U000f107b",
 	"cfg":     "\U000f107b",
 	"conf":    "\U000f107b",
@@ -246,9 +246,9 @@ var Extensions = map[string]string{
 	"tiff": "\U0000f1c5",
 	"webp": "\U0000f1c5",
 	"ico":  "\U0000f1c5",
-	"svg":  "\U0000f0559",
-	"eps":  "\U0000f0559",
-	"ps":   "\U0000f0559",
+	"svg":  "\U000f0559",
+	"eps":  "\U000f0559",
+	"ps":   "\U000f0559",
 	"ai":   "\U0000e7b4",
 	"psd":  "\U0000e7b8",
 	"psb":  "\U0000e7b8",
@@ -298,9 +298,9 @@ var Extensions = map[string]string{
 	"mp2":  "\U0000f001",
 	"mka":  "\U0000f001",
 	"pcm":  "\U0000f001",
-	"mid":  "\U0000f08f2",
-	"sf2":  "\U0000f0f70",
-	"sfz":  "\U0000f0f70",
+	"mid":  "\U000f08f2",
+	"sf2":  "\U000f0f70",
+	"sfz":  "\U000f0f70",
 
 	// Video
 	"mp4":   "\U0000f03d",
@@ -400,10 +400,10 @@ var Extensions = map[string]string{
 	"cshtml":   "\U0000f1fa",
 
 	// DevOps/Infra
-	"tf":      "\U0000f1062",
-	"tfstate": "\U0000f1062",
-	"tfvars":  "\U0000f1062",
-	"hcl":     "\U0000f1062",
+	"tf":      "\U000f1062",
+	"tfstate": "\U000f1062",
+	"tfvars":  "\U000f1062",
+	"hcl":     "\U000f1062",
 	"vagrant": "\U0000e21e",
 	"ansible": "\U0000e77c",
 	"puppet":  "\U0000e631",
@@ -412,9 +412,9 @@ var Extensions = map[string]string{
 	"cmake": "\U0000e794",
 	"make":  "\U0000e673",
 	"mk":    "\U0000e673",
-	"ninja": "\U0000f0774",
+	"ninja": "\U000f0774",
 	"gyp":   "\U0000e7a3",
-	"sbt":   "\U0000f0a16",
+	"sbt":   "\U000f0a16",
 	"maven": "\U0000e7b6",
 	"ant":   "\U0000e7a0",
 	"bazel": "\U0000e63a",
@@ -435,9 +435,9 @@ var Extensions = map[string]string{
 	"p12":  "\U0000eb11",
 	"gpg":  "\U000f099d",
 	"asc":  "\U000f099d",
-	"sig":  "\U0000f19c3",
-	"pub":  "\U0000f0dd6",
-	"kbx":  "\U0000f0bc4",
+	"sig":  "\U000f19c3",
+	"pub":  "\U000f0dd6",
+	"kbx":  "\U000f0bc4",
 	"kdb":  "\U0000f23e",
 	"kdbx": "\U0000f23e",
 	"age":  "\U000f099d",
@@ -456,7 +456,7 @@ var Extensions = map[string]string{
 	"hi":       "\U0000eae8",
 	"rlib":     "\U0000e68b",
 	"rmeta":    "\U0000e68b",
-	"hex":      "\U0000f12a7",
+	"hex":      "\U000f12a7",
 	"diff":     "\U0000f440",
 	"patch":    "\U0000f440",
 	"torrent":  "\U0000e275",
@@ -489,15 +489,15 @@ var Extensions = map[string]string{
 	"tscn":    "\U0000e65f",
 	"tres":    "\U0000e65f",
 	"blend":   "\U000f00ab",
-	"fbx":     "\U0000f01a7",
-	"obj":     "\U0000f01a7",
-	"stl":     "\U0000f01a7",
-	"ply":     "\U0000f01a7",
-	"gltf":    "\U0000f01a7",
-	"glb":     "\U0000f01a7",
-	"wrl":     "\U0000f01a7",
-	"wrz":     "\U0000f01a7",
-	"3mf":     "\U0000f01a7",
+	"fbx":     "\U000f01a7",
+	"obj":     "\U000f01a7",
+	"stl":     "\U000f01a7",
+	"ply":     "\U000f01a7",
+	"gltf":    "\U000f01a7",
+	"glb":     "\U000f01a7",
+	"wrl":     "\U000f01a7",
+	"wrz":     "\U000f01a7",
+	"3mf":     "\U000f01a7",
 
 	// CAD
 	"dwg":        "\U000f0eeb",
@@ -531,8 +531,8 @@ var Extensions = map[string]string{
 	"ifc":        "\U000f0eeb",
 
 	// Electronics
-	"sch":       "\U0000f0b45",
-	"schdoc":    "\U0000f0b45",
+	"sch":       "\U000f0b45",
+	"schdoc":    "\U000f0b45",
 	"brd":       "\U0000eabe",
 	"pcbdoc":    "\U0000eabe",
 	"prjpcb":    "\U0000eabe",
@@ -557,23 +557,23 @@ var Extensions = map[string]string{
 	"gml":       "\U0000eabe",
 	"lpp":       "\U0000eabe",
 	"ino":       "\U0000f34b",
-	"gcode":     "\U0000f0af4",
+	"gcode":     "\U000f0af4",
 
 	// Notebooks
 	"ipynb": "\U0000e678",
 
 	// Subtitles
-	"srt": "\U0000f0a16",
-	"sub": "\U0000f0a16",
-	"ass": "\U0000f0a16",
-	"ssa": "\U0000f0a16",
-	"lrc": "\U0000f0a16",
+	"srt": "\U000f0a16",
+	"sub": "\U000f0a16",
+	"ass": "\U000f0a16",
+	"ssa": "\U000f0a16",
+	"lrc": "\U000f0a16",
 
 	// Playlists
-	"m3u":  "\U0000f0cb9",
-	"m3u8": "\U0000f0cb9",
-	"pls":  "\U0000f0cb9",
-	"cue":  "\U0000f0cb9",
+	"m3u":  "\U000f0cb9",
+	"m3u8": "\U000f0cb9",
+	"pls":  "\U000f0cb9",
+	"cue":  "\U000f0cb9",
 
 	// Qt
 	"qml": "\U0000f375",
@@ -589,26 +589,26 @@ var Extensions = map[string]string{
 	"tc":    "\U0000e271",
 
 	// Hashes
-	"md5":    "\U0000f0565",
-	"sha1":   "\U0000f0565",
-	"sha224": "\U0000f0565",
-	"sha256": "\U0000f0565",
-	"sha384": "\U0000f0565",
-	"sha512": "\U0000f0565",
+	"md5":    "\U000f0565",
+	"sha1":   "\U000f0565",
+	"sha224": "\U000f0565",
+	"sha256": "\U000f0565",
+	"sha384": "\U000f0565",
+	"sha512": "\U000f0565",
 
 	// Misc dev
 	"nix":         "\U0000f313",
 	"ebuild":      "\U0000f30d",
-	"opam":        "\U0000f0627",
+	"opam":        "\U000f0627",
 	"conda":       "\U0000e715",
 	"whl":         "\U0000e606",
 	"gem":         "\U0000e739",
 	"gemspec":     "\U0000e739",
 	"drawio":      "\U0000ebba",
-	"dot":         "\U0000f1049",
-	"gv":          "\U0000f1049",
+	"dot":         "\U000f1049",
+	"gv":          "\U000f1049",
 	"rss":         "\U0000f09e",
-	"opml":        "\U0000f05c0",
+	"opml":        "\U000f05c0",
 	"applescript": "\U0000f179",
 	"vhs":         "\uF0A1B",
 
@@ -623,17 +623,17 @@ var Extensions = map[string]string{
 	"vim": "\U0000e7c5",
 
 	// Tcl
-	"tcl": "\U0000f06d3",
-	"tbc": "\U0000f06d3",
+	"tcl": "\U000f06d3",
+	"tbc": "\U000f06d3",
 
 	// Steam
 	"acf": "\U0000f1b6",
 
 	// ROM
-	"gba": "\U0000f1393",
+	"gba": "\U000f1393",
 	"nsp": "\uF07E1",
 	"xci": "\uF07E1",
-	"z64": "\U0000f1393",
+	"z64": "\U000f1393",
 
 	// Salesforce
 	"sal": "\U000f147b",
@@ -643,12 +643,12 @@ var Extensions = map[string]string{
 // Filenames maps specific filenames to Nerd Font icons.
 var Filenames = map[string]string{
 	// Git
-	".gitignore":             "\U0000f02a2",
-	".gitattributes":         "\U0000f02a2",
-	".gitmodules":            "\U0000f02a2",
-	".gitconfig":             "\U0000f02a2",
-	".gitkeep":               "\U0000f02a2",
-	".git-blame-ignore-revs": "\U0000f02a2",
+	".gitignore":             "\U000f02a2",
+	".gitattributes":         "\U000f02a2",
+	".gitmodules":            "\U000f02a2",
+	".gitconfig":             "\U000f02a2",
+	".gitkeep":               "\U000f02a2",
+	".git-blame-ignore-revs": "\U000f02a2",
 
 	// Docker
 	"dockerfile":          "\U0000e650",
@@ -752,7 +752,7 @@ var Filenames = map[string]string{
 	"meson.build":     "\U0000e673",
 	"SConstruct":      "\U0000e606",
 	"SConscript":      "\U0000e606",
-	"build.ninja":     "\U0000f0774",
+	"build.ninja":     "\U000f0774",
 	"configure":       "\U0000e673",
 	"configure.ac":    "\U0000e673",
 	"Makefile.am":     "\U0000e673",
@@ -849,14 +849,14 @@ var Filenames = map[string]string{
 	".agignore":        "\U0000f013",
 
 	// Terraform
-	"terraform.tf":        "\U0000f1062",
-	"terraform.tfvars":    "\U0000f1062",
-	"main.tf":             "\U0000f1062",
-	"variables.tf":        "\U0000f1062",
-	"outputs.tf":          "\U0000f1062",
-	"providers.tf":        "\U0000f1062",
-	"versions.tf":         "\U0000f1062",
-	".terraform.lock.hcl": "\U0000f1062",
+	"terraform.tf":        "\U000f1062",
+	"terraform.tfvars":    "\U000f1062",
+	"main.tf":             "\U000f1062",
+	"variables.tf":        "\U000f1062",
+	"outputs.tf":          "\U000f1062",
+	"providers.tf":        "\U000f1062",
+	"versions.tf":         "\U000f1062",
+	".terraform.lock.hcl": "\U000f1062",
 
 	// Kubernetes
 	"Chart.yaml":         "\U0000fd31",
@@ -922,7 +922,7 @@ var Filenames = map[string]string{
 
 // Directories maps directory names to Nerd Font icons.
 var Directories = map[string]string{
-	".git":             "\U0000f02a2",
+	".git":             "\U000f02a2",
 	".github":          "\U0000e5fd",
 	".gitlab":          "\U0000f296",
 	".svn":             "\U0000e72d",
@@ -949,7 +949,7 @@ var Directories = map[string]string{
 	".nvm":             "\U0000e718",
 	".docker":          "\U0000e650",
 	".kube":            "\U0000fd31",
-	".terraform":       "\U0000f1062",
+	".terraform":       "\U000f1062",
 	".aws":             "\U0000e7ad",
 	".azure":           "\U0000f3ca",
 	".gcloud":          "\U0000e7b2",
@@ -1064,8 +1064,8 @@ var Directories = map[string]string{
 	"Pictures":         "\U0000f1c5",
 	"Videos":           "\U0000f03d",
 	"Movies":           "\U0000f03d",
-	"home":             "\U0000f10b5",
-	"Home":             "\U0000f10b5",
+	"home":             "\U000f10b5",
+	"Home":             "\U000f10b5",
 	"root":             "\U0000f023",
 	"usr":              "\U0000f007",
 	"var":              "\U0000f07c",
