@@ -18,7 +18,6 @@ type UIConfig struct {
 	ColorFileNames  bool   `yaml:"colorFileNames"` // Color filenames by git status (default: true)
 	ShowDiffStats   bool   `yaml:"showDiffStats"`  // Show the amount of lines added / removed next to the file
 	SideBySide      bool   `yaml:"sideBySide"`     // Side-by-side diff view (default: true)
-	NavigateDirs    bool   `yaml:"navigateDirs"`   // Allow selecting directories with arrow keys (default: false)
 }
 
 type Config struct {

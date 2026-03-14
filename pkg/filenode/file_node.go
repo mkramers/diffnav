@@ -8,9 +8,9 @@ import (
 	"charm.land/lipgloss/v2"
 	"charm.land/lipgloss/v2/tree"
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
+	devicons "github.com/epilande/go-devicons"
 
 	"github.com/dlvhdr/diffnav/pkg/config"
-	"github.com/dlvhdr/diffnav/pkg/icons"
 	"github.com/dlvhdr/diffnav/pkg/utils"
 )
 
@@ -85,17 +85,17 @@ func (f *FileNode) renderStandardLayout(name string) string {
 // All icons colored by git status.
 func (f *FileNode) renderFullLayout(name string) string {
 	statusIcon := f.getStatusIcon()
-	fileIcon := icons.GetIcon(name, false)
+	di := devicons.IconForPath(filepath.Base(f.Path()))
 	statusStyle := lipgloss.NewStyle().Foreground(f.StatusColor())
-	iconStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("7"))
+	iconStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(di.Color))
 
 	stats := ""
 	if f.Cfg.UI.ShowDiffStats {
 		stats = " " + ViewFileDiffStats(f.File, lipgloss.NewStyle())
 	}
 
-	iconsPrefix := statusStyle.Render(statusIcon) + " " + iconStyle.Render(fileIcon) + " "
-	iconsWidth := lipgloss.Width(statusIcon) + 1 + lipgloss.Width(fileIcon) + 1
+	iconsPrefix := statusStyle.Render(statusIcon) + " " + iconStyle.Render(di.Icon) + " "
+	iconsWidth := lipgloss.Width(statusIcon) + 1 + lipgloss.Width(di.Icon) + 1
 
 	nameMaxWidth := f.PanelWidth - f.Depth - iconsWidth - lipgloss.Width(stats)
 	truncatedName := utils.TruncateString(name, nameMaxWidth)
@@ -126,7 +126,7 @@ func (f *FileNode) getIcon() string {
 	case IconsNerdSimple:
 		return ""
 	case IconsNerdFiletype:
-		return icons.GetIcon(name, false) // File-type specific icon (colored by status)
+		return devicons.IconForPath(name).Icon
 	case IconsUnicode:
 		if f.File.IsNew {
 			return "+"

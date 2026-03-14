@@ -74,6 +74,7 @@ type mainModel struct {
 	draggingSidebar   bool
 	iconStyle         string
 	sideBySide        bool
+	concatDiff        bool
 	help              help.Model
 	helpOpen          bool
 }
@@ -152,7 +153,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.resultsVp.SetHeight(m.mainContentHeight() - searchHeight)
 			m.resultsVp.SetContent(m.resultsView())
 
-			dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth(), m.mainContentHeight())
+			dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth()-3, m.mainContentHeight())
 			cmds = append(cmds, dfCmd, m.search.Focus())
 		case key.Matches(msg, keys.ToggleFileTree):
 			m.isShowingFileTree = !m.isShowingFileTree
@@ -171,12 +172,17 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.fileTree.SetSize(treeWidth, h-searchHeight)
 			m.search.SetWidth(m.searchWidth())
-			dfCmd := m.diffViewer.SetSize(m.width-sidebarWidth, h)
+			dfCmd := m.diffViewer.SetSize(m.width-sidebarWidth-3, h)
 			cmds = append(cmds, dfCmd)
 		case key.Matches(msg, keys.ToggleFlatList):
 			m.fileTree.ToggleFlatMode()
 		case key.Matches(msg, keys.ToggleIconStyle):
 			m.cycleIconStyle()
+		case key.Matches(msg, keys.ToggleConcatView):
+			m.concatDiff = !m.concatDiff
+			node := m.fileTree.GetCurrNode()
+			m, cmd = m.setNodeDiff(node)
+			cmds = append(cmds, cmd)
 		case key.Matches(msg, keys.ToggleDiffView):
 			m.sideBySide = !m.sideBySide
 			cmd = m.diffViewer.SetSideBySide(m.sideBySide)
@@ -203,6 +209,18 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				m.diffViewer.ScrollDown(1)
 			}
+		case key.Matches(msg, keys.PrevFile):
+			m.fileTree.PrevFile()
+			node := m.fileTree.GetCurrNode()
+			m, cmd = m.setNodeDiff(node)
+			m.diffViewer.GoToTop()
+			cmds = append(cmds, cmd)
+		case key.Matches(msg, keys.NextFile):
+			m.fileTree.NextFile()
+			node := m.fileTree.GetCurrNode()
+			m, cmd = m.setNodeDiff(node)
+			m.diffViewer.GoToTop()
+			cmds = append(cmds, cmd)
 		case key.Matches(msg, keys.Copy):
 			cmd = m.fileTree.CopyCurrNodePath()
 			if cmd != nil {
@@ -220,7 +238,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.Update(msg)
 		m.width = msg.Width
 		m.height = msg.Height
-		dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth(), m.mainContentHeight())
+		dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth()-3, m.mainContentHeight())
 		cmds = append(cmds, dfCmd)
 
 		tWidth, tHeight := m.sidebarWidth(), m.mainContentHeight()-searchHeight
@@ -235,7 +253,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.fileTree = m.fileTree.SetFiles(m.files)
 		m.diffViewer.SetPreamble(strings.TrimSpace(msg.preamble))
-		m.diffViewer, cmd = m.diffViewer.SetDirPatch("/", m.fileTree.GetCurrNodeDesendantDiffs())
+		node := m.fileTree.GetCurrNode()
+		m, cmd = m.setNodeDiff(node)
 		cmds = append(cmds, cmd)
 
 	case common.ErrMsg:
@@ -271,7 +290,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *mainModel) mainContentHeight() int {
-	return m.height - m.headerHeight() - m.footerHeight()
+	return m.height - m.headerHeight() - m.footerHeight() - 2 // separator + border padding
 }
 
 func (m *mainModel) cycleIconStyle() {
@@ -301,13 +320,13 @@ func (m mainModel) searchUpdate(msg tea.Msg) (mainModel, []tea.Cmd) {
 			switch msg.String() {
 			case "esc":
 				m.stopSearch()
-				dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth(), m.mainContentHeight())
+				dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth()-3, m.mainContentHeight())
 				cmds = append(cmds, dfCmd)
 			case "ctrl+c":
 				return m, []tea.Cmd{tea.Quit}
 			case "enter":
 				m.stopSearch()
-				dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth(), m.mainContentHeight())
+				dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth()-3, m.mainContentHeight())
 				cmds = append(cmds, dfCmd)
 
 				if selected, ok := m.selectedSearchResult(); ok {
@@ -413,7 +432,9 @@ func (m mainModel) View() tea.View {
 	}
 
 	dv := zone.Mark(zoneDiffViewer, m.diffViewer.View())
-	mainContent := lipgloss.JoinHorizontal(lipgloss.Top, sidebar, dv)
+	total, vis, offset := m.diffViewer.ScrollInfo()
+	dvScrollbar := common.RenderScrollbar(vis, total, vis, offset)
+	mainContent := lipgloss.JoinHorizontal(lipgloss.Top, sidebar, dv, dvScrollbar)
 
 	var sections []string
 
@@ -627,7 +648,7 @@ func (m mainModel) handleSearchResultClick(msg tea.MouseMsg) (tea.Model, tea.Cmd
 
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
-	dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth(), m.mainContentHeight())
+	dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth()-3, m.mainContentHeight())
 	cmds = append(cmds, dfCmd)
 
 	for _, f := range m.files {
@@ -656,7 +677,7 @@ func (m mainModel) handleSearchBoxClick() (tea.Model, tea.Cmd) {
 	m.resultsVp.SetHeight(m.mainContentHeight() - searchHeight)
 	m.resultsVp.SetContent(m.resultsView())
 
-	dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth(), m.mainContentHeight())
+	dfCmd := m.diffViewer.SetSize(m.width-m.sidebarWidth()-3, m.mainContentHeight())
 	return m, tea.Batch(dfCmd, m.search.Focus())
 }
 
@@ -740,7 +761,7 @@ func (m mainModel) handleSidebarDrag(msg tea.MouseMsg) (tea.Model, tea.Cmd) {
 	// Resize components.
 	cmds := []tea.Cmd{}
 
-	cmds = append(cmds, m.diffViewer.SetSize(m.width-newWidth, m.mainContentHeight()))
+	cmds = append(cmds, m.diffViewer.SetSize(m.width-newWidth-3, m.mainContentHeight()))
 	m.fileTree.SetSize(newWidth-1, m.mainContentHeight()-searchHeight-1)
 
 	return m, tea.Batch(cmds...)
@@ -775,16 +796,29 @@ func (m mainModel) setNodeDiff(node *tree.Node) (mainModel, tea.Cmd) {
 	case *filenode.FileNode:
 		m.diffViewer, cmd = m.diffViewer.SetFilePatch(val.File)
 	case string, *dirnode.DirNode:
-		files := m.fileTree.GetCurrNodeDesendantDiffs()
-
-		fullPath := "/"
-		if val, ok := node.GivenValue().(*dirnode.DirNode); ok {
-			fullPath = val.FullPath
+		files := descendantFiles(node)
+		if m.concatDiff {
+			fullPath := "/"
+			if val, ok := node.GivenValue().(*dirnode.DirNode); ok {
+				fullPath = val.FullPath
+			}
+			m.diffViewer, cmd = m.diffViewer.SetDirPatch(fullPath, files)
+		} else if len(files) > 0 {
+			m.diffViewer, cmd = m.diffViewer.SetFilePatch(files[0])
 		}
-		m.diffViewer, cmd = m.diffViewer.SetDirPatch(fullPath, files)
 	}
 
 	return m, cmd
+}
+
+func descendantFiles(node *tree.Node) []*gitdiff.File {
+	var files []*gitdiff.File
+	for _, n := range node.AllNodes() {
+		if f, ok := n.GivenValue().(*filenode.FileNode); ok {
+			files = append(files, f.File)
+		}
+	}
+	return files
 }
 
 func (m *mainModel) setSearchResults() {

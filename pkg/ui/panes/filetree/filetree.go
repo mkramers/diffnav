@@ -23,11 +23,10 @@ import (
 )
 
 type Model struct {
-	t            tree.Model
-	files        []*gitdiff.File
-	cfg          config.Config
-	flatMode     bool
-	navigateDirs bool
+	t        tree.Model
+	files    []*gitdiff.File
+	cfg      config.Config
+	flatMode bool
 }
 
 func New(cfg config.Config) Model {
@@ -38,9 +37,8 @@ func New(cfg config.Config) Model {
 	t.SetScrollOff(3)
 
 	m := Model{
-		t:            t,
-		cfg:          cfg,
-		navigateDirs: cfg.UI.NavigateDirs,
+		t:   t,
+		cfg: cfg,
 	}
 
 	open, closed := getDirIcons(m.cfg.UI.Icons)
@@ -69,7 +67,14 @@ func (m *Model) Update(msg tea.Msg) (*Model, tea.Cmd) {
 }
 
 func (m *Model) View() string {
-	return m.t.View()
+	treeView := m.t.View()
+	scrollbar := common.RenderScrollbar(
+		m.t.Height(), len(m.t.AllNodes()), m.t.Height(), m.t.ViewportYOffset(),
+	)
+	if scrollbar != "" {
+		return lipgloss.JoinHorizontal(lipgloss.Top, treeView, scrollbar)
+	}
+	return treeView
 }
 
 func getDirIcons(iconStyle string) (string, string) {
@@ -128,34 +133,37 @@ func (m Model) SetFiles(files []*gitdiff.File) Model {
 
 func (m *Model) Down() {
 	m.t.Down()
-	if !m.navigateDirs {
-		m.skipToFile(1)
-	}
 }
 
 func (m *Model) Up() {
 	m.t.Up()
-	if !m.navigateDirs {
-		m.skipToFile(-1)
-	}
 }
 
-func (m *Model) skipToFile(direction int) {
+// NextFile moves cursor to the next file node, skipping directories.
+func (m *Model) NextFile() {
 	for {
+		prev := m.t.NodeAtCurrentOffset()
+		m.t.Down()
 		node := m.t.NodeAtCurrentOffset()
-		if node == nil {
-			break
+		if node == prev {
+			break // at boundary
 		}
 		if _, ok := node.GivenValue().(*filenode.FileNode); ok {
 			break
 		}
-		if direction > 0 {
-			m.t.Down()
-		} else {
-			m.t.Up()
+	}
+}
+
+// PrevFile moves cursor to the previous file node, skipping directories.
+func (m *Model) PrevFile() {
+	for {
+		prev := m.t.NodeAtCurrentOffset()
+		m.t.Up()
+		node := m.t.NodeAtCurrentOffset()
+		if node == prev {
+			break // at boundary
 		}
-		// Stop if we didn't move (at boundary)
-		if m.t.NodeAtCurrentOffset() == node {
+		if _, ok := node.GivenValue().(*filenode.FileNode); ok {
 			break
 		}
 	}
@@ -389,11 +397,11 @@ func truncateTree(
 }
 
 var enumerator = func(children ltree.Children, index int) string {
-	return "│"
+	return " "
 }
 
 var indenter = func(children ltree.Children, index int) string {
-	return "│"
+	return " "
 }
 
 // SetSize implements the Component interface.

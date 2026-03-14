@@ -13,6 +13,7 @@ require (
 	github.com/charmbracelet/fang v0.4.4
 	github.com/charmbracelet/log v0.4.2
 	github.com/charmbracelet/x/ansi v0.11.6
+	github.com/epilande/go-devicons v0.0.0-20250505162540-0661cab71a28
 	github.com/lrstanley/bubblezone/v2 v2.0.0-alpha.3
 	github.com/muesli/reflow v0.3.0
 	github.com/muesli/termenv v0.16.0

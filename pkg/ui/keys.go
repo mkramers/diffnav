@@ -17,7 +17,10 @@ type KeyMap struct {
 	Copy            key.Binding
 	SwitchPanel     key.Binding
 	OpenInEditor    key.Binding
+	PrevFile        key.Binding
+	NextFile        key.Binding
 	ToggleDiffView  key.Binding
+	ToggleConcatView key.Binding
 	ToggleIconStyle key.Binding
 	ToggleHelp      key.Binding
 }
@@ -79,9 +82,21 @@ var keys = &KeyMap{
 		key.WithKeys("o"),
 		key.WithHelp("o", "open"),
 	),
+	PrevFile: key.NewBinding(
+		key.WithKeys("shift+up"),
+		key.WithHelp("shift+↑", "prev file"),
+	),
+	NextFile: key.NewBinding(
+		key.WithKeys("shift+down"),
+		key.WithHelp("shift+↓", "next file"),
+	),
 	ToggleDiffView: key.NewBinding(
 		key.WithKeys("s"),
 		key.WithHelp("s", "toggle side-by-side"),
+	),
+	ToggleConcatView: key.NewBinding(
+		key.WithKeys("c"),
+		key.WithHelp("c", "toggle concat diff"),
 	),
 	ToggleIconStyle: key.NewBinding(
 		key.WithKeys("i"),
@@ -106,7 +121,10 @@ func KeyGroups() [][]key.Binding {
 		keys.Search,
 		keys.Copy,
 		keys.OpenInEditor,
+		keys.PrevFile,
+		keys.NextFile,
 		keys.ToggleDiffView,
+		keys.ToggleConcatView,
 		keys.ToggleIconStyle,
 	}, {
 		keys.ToggleHelp,

@@ -12,13 +12,13 @@ import (
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 	"github.com/charmbracelet/x/ansi"
 
+	devicons "github.com/epilande/go-devicons"
 	"github.com/dlvhdr/diffnav/pkg/filenode"
-	"github.com/dlvhdr/diffnav/pkg/icons"
 	"github.com/dlvhdr/diffnav/pkg/ui/common"
 	"github.com/dlvhdr/diffnav/pkg/utils"
 )
 
-const dirHeaderHeight = 3
+const dirHeaderHeight = 2
 
 type cachedNode struct {
 	path      string
@@ -163,36 +163,37 @@ func (m Model) headerView() string {
 	name := m.file.path
 	base := lipgloss.NewStyle()
 
-	fileIcon := icons.GetIcon(name, false)
-	prefix := base.Render(fileIcon) + base.Render(" ")
-	name = utils.TruncateString(name, m.Width-lipgloss.Width(prefix))
-	top := prefix + base.Bold(true).Render(name)
-
-	bottom := filenode.ViewFileDiffStats(m.file.files[0], base)
+	di := devicons.IconForPath(name)
+	prefix := base.Foreground(lipgloss.Color(di.Color)).Render(di.Icon) + base.Render(" ")
+	stats := filenode.ViewFileDiffStats(m.file.files[0], base)
+	nameMaxWidth := m.Width - lipgloss.Width(prefix) - lipgloss.Width(stats) - 1
+	name = utils.TruncateString(name, nameMaxWidth)
+	left := prefix + base.Bold(true).Render(name)
+	spacing := strings.Repeat(" ", max(0, m.Width-lipgloss.Width(left)-lipgloss.Width(stats)))
 
 	return base.
 		Width(m.Width).
-		Height(dirHeaderHeight - 1).
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderBottom(true).
 		BorderForeground(lipgloss.Color("8")).
-		Render(lipgloss.JoinVertical(lipgloss.Left, top, bottom))
+		Render(left + spacing + stats)
 }
 
 func (m Model) dirHeaderView() string {
 	base := lipgloss.NewStyle().Foreground(lipgloss.Blue)
-	prefix := base.Render(" ")
-	name := utils.TruncateString(m.dir.path, m.Width-lipgloss.Width(prefix))
+	prefix := base.Render("\ue5fe ")
+	stats := filenode.ViewDiffStats(m.dir.additions, m.dir.deletions, base)
+	nameMaxWidth := m.Width - lipgloss.Width(prefix) - lipgloss.Width(stats) - 1
+	name := utils.TruncateString(m.dir.path, nameMaxWidth)
+	left := prefix + base.Bold(true).Render(name)
+	spacing := strings.Repeat(" ", max(0, m.Width-lipgloss.Width(left)-lipgloss.Width(stats)))
 
-	top := prefix + base.Bold(true).Render(name)
-	bottom := filenode.ViewDiffStats(m.dir.additions, m.dir.deletions, base)
 	return base.
 		Width(m.Width).
-		Height(dirHeaderHeight - 1).
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderBottom(true).
 		BorderForeground(lipgloss.Color("8")).
-		Render(lipgloss.JoinVertical(lipgloss.Left, top, bottom))
+		Render(left + spacing + stats)
 }
 
 func (m Model) SetFilePatch(file *gitdiff.File) (Model, tea.Cmd) {
@@ -270,6 +271,12 @@ func (m *Model) ScrollDown(lines int) {
 	m.vp.ScrollDown(lines)
 }
 
+// ScrollInfo returns total lines, visible height, and scroll offset.
+func (m *Model) ScrollInfo() (int, int, int) {
+	return m.vp.TotalLineCount(), m.vp.Height(), m.vp.YOffset()
+}
+
+
 func diffFile(node *cachedNode, width int, sideBySide bool) tea.Cmd {
 	if width == 0 || node == nil || len(node.files) != 1 {
 		return nil
@@ -278,10 +285,11 @@ func diffFile(node *cachedNode, width int, sideBySide bool) tea.Cmd {
 	file := node.files[0]
 	key := cacheKey(node.path, sideBySide)
 	return func() tea.Msg {
-		// Only use side-by-side if preference is true AND file is not new/deleted
 		useSideBySide := sideBySide && !file.IsNew && !file.IsDelete
 		args := []string{
 			"--paging=never",
+			"--file-style=omit",
+			"--file-decoration-style=omit",
 			fmt.Sprintf("-w=%d", width),
 			fmt.Sprintf("--max-line-length=%d", width),
 		}
@@ -310,14 +318,15 @@ func diffDir(dir *cachedNode, width int, sideBySide bool, preamble string) tea.C
 		useSideBySide := sideBySide
 		args := []string{
 			"--paging=never",
+			"--file-style=omit",
+			"--file-decoration-style=omit",
 			fmt.Sprintf("--file-modified-label=%s",
-				utils.RemoveReset(s.Foreground(lipgloss.Yellow).Render(" "))),
+				utils.RemoveReset(s.Foreground(lipgloss.Yellow).Render(" "))),
 			fmt.Sprintf("--file-removed-label=%s",
-				utils.RemoveReset(s.Foreground(lipgloss.Red).Render(" "))),
+				utils.RemoveReset(s.Foreground(lipgloss.Red).Render(" "))),
 			fmt.Sprintf("--file-added-label=%s",
-				utils.RemoveReset(s.Foreground(lipgloss.Green).Render(" "))),
+				utils.RemoveReset(s.Foreground(lipgloss.Green).Render(" "))),
 			fmt.Sprintf("--file-style='%s bold %s'", c, c),
-			fmt.Sprintf("--file-decoration-style='%s box %s'", c, c),
 			fmt.Sprintf("-w=%d", width),
 			fmt.Sprintf("--max-line-length=%d", width),
 		}
